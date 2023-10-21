@@ -70,20 +70,22 @@ public:
     //bits operations
     
     //INV
-    void operator~() {
-        if (blocks.size() == 1){
-            if(blocks.back() == 0){
-                blocks.back() = 1;
-                return;
+    BigInt operator~() {
+        BigInt result(*this);
+        if (result.blocks.size() == 1){
+            if(result.blocks.back() == 0){
+                result.blocks.back() = 1;
+                return result;
             }
-            _INV_for_last_block();
-            return;
+            result._INV_for_last_block();
+            return result;
         }
-        for (size_t i = 0; i < blocks.size() - 1; ++i) {
-            blocks[i] = ~blocks[i];
+        for (size_t i = 0; i < result.blocks.size() - 1; ++i) {
+            result.blocks[i] = ~result.blocks[i];
         }
-        _INV_for_last_block();
-        delete_empty_blocks();
+        result._INV_for_last_block();
+        result.delete_empty_blocks();
+        return result;
     }
     //xor
     BigInt operator^ (const BigInt& other) const{
@@ -134,49 +136,52 @@ public:
         return result;
     }
     //shift left
-    void operator<< (int n) {
+    BigInt operator<< (int n) {
+        BigInt result(*this); 
         if (n <= 0) {
-            return; 
+            return result; 
         }
         if (n>= 32){
-            *this << (n%32);
+            result = *this << (n%32);
             for(int i = 1; i <= n / 32; i++)
-                blocks.push_front(0);
-            return;
+                result.blocks.push_front(0);
+            return result;
         }
         int carry = 0;
-        for (int i = 0; i < blocks.size(); ++i) {
-            unsigned int shifted = blocks[i] << n;
+        for (int i = 0; i < result.blocks.size(); ++i) {
+            unsigned int shifted = result.blocks[i] << n;
             shifted |= carry;  
-            carry = blocks[i] >> (32 - n);
-            blocks[i] = shifted;
+            carry = result.blocks[i] >> (32 - n);
+            result.blocks[i] = shifted;
         }
         if (carry != 0) {
-            blocks.push_back(carry);
+            result.blocks.push_back(carry);
         }
-        delete_empty_blocks();
+        result.delete_empty_blocks();
+        return result;
     }
     
     //shift right
-    void operator>> (int n) {
+    BigInt operator>> (int n) {
+        BigInt result(*this); 
         if (n <= 0) {
-            return;
+            return result;
         }
         if (n>= 32){
             for(int i = 1; i <= n / 32; i++)
-                blocks.pop_front();
-            *this >> (n % 32);
-            return;
+                result.blocks.pop_front();
+            return result >> (n % 32);
         }
 
         int carry = 0;
-        for (int i = blocks.size() - 1; i >= 0; --i) {
-            unsigned int shifted = blocks[i] >> n;
+        for (int i = result.blocks.size() - 1; i >= 0; --i) {
+            unsigned int shifted = result.blocks[i] >> n;
             shifted |= carry << (32 - n); 
-            carry = (blocks[i] & ((1 << n) - 1)); 
-            blocks[i] = shifted;
+            carry = (result.blocks[i] & ((1 << n) - 1)); 
+            result.blocks[i] = shifted;
         }
-        delete_empty_blocks();
+        result.delete_empty_blocks();
+        return result;
     }
 
     //arifmetical operations
@@ -486,15 +491,15 @@ int main(){
 
     //Test3
     std::cout <<"For INV:"<< std::endl;
-    num3;
+    num;
     inp = "101001";
     out = "10110";
-    num3.setBin(inp);
+    num.setBin(inp);
     std::cout<<"Before : "<<std::endl;
-    std::cout << "Hex: " << num3.getHex() << std::endl;
-    std::cout << "Bin: " << num3.getBin() << std::endl;
+    std::cout << "Hex: " << num.getHex() << std::endl;
+    std::cout << "Bin: " << num.getBin() << std::endl;
     std::cout <<"----"<< std::endl;
-    ~num3;
+    num3 = ~num;
     std::cout<<"After : "<<std::endl;
     std::cout << "Hex: " << num3.getHex() << std::endl;
     std::cout << "Bin: " << num3.getBin() << std::endl;
@@ -558,11 +563,11 @@ int main(){
     out = "0001101011010101011101011010101011110000";
     std::cout << "Bin1: " << num.getBin() << std::endl;
     std::cout <<"----"<< std::endl;
-    num<<4;
+    num3 = num<<4;
     out = make_correct_len(out, 32);
     std::cout << "Expect: " << out<<std::endl;
-    std::cout << "Result: " << num.getBin() << std::endl;
-    std::cout <<"Correct : " <<compare(out, num.getBin())<<std::endl;
+    std::cout << "Result: " << num3.getBin() << std::endl;
+    std::cout <<"Correct : " <<compare(out, num3.getBin())<<std::endl;
     std::cout <<"_________________________"<< std::endl;
 
     //test 8
@@ -571,11 +576,11 @@ int main(){
     out = "010101110101101010101111000000000000000000000000000000000000";
     std::cout << "Bin1: " << num.getBin() << std::endl;
     std::cout <<"----"<< std::endl;
-    num<<(36);
+    num3 = num<<(36);
     out = make_correct_len(out, 32);
     std::cout << "Expect: " << out<<std::endl;
-    std::cout << "Result: " << num.getBin() << std::endl;
-    std::cout <<"Correct : " <<compare(out, num.getBin())<<std::endl;
+    std::cout << "Result: " << num3.getBin() << std::endl;
+    std::cout <<"Correct : " <<compare(out, num3.getBin())<<std::endl;
     std::cout <<"_________________________"<< std::endl;
     
     //test 9
@@ -584,11 +589,11 @@ int main(){
     out = "11100011010110101010111010110101010";
     std::cout << "Bin1: " << num.getBin() << std::endl;
     std::cout <<"----"<< std::endl;
-    num>>(4);
+    num3 = num>>(4);
     out = make_correct_len(out, 32);
     std::cout << "Expect: " << out<<std::endl;
-    std::cout << "Result: " << num.getBin() << std::endl;
-    std::cout <<"Correct : " <<compare(out, num.getBin())<<std::endl;
+    std::cout << "Result: " << num3.getBin() << std::endl;
+    std::cout <<"Correct : " <<compare(out, num3.getBin())<<std::endl;
     std::cout <<"_________________________"<< std::endl;
     
     
@@ -597,11 +602,11 @@ int main(){
     out = "00111000";
     std::cout << "Bin1: " << num.getBin() << std::endl;
     std::cout <<"----"<< std::endl;
-    num>>33;
+    num3 = num>>33;
     out = make_correct_len(out, 32);
     std::cout << "Expect: " << out<<std::endl;
-    std::cout << "Result: " << num.getBin() << std::endl;
-    std::cout <<"Correct : " <<compare(out, num.getBin())<<std::endl;
+    std::cout << "Result: " << num3.getBin() << std::endl;
+    std::cout <<"Correct : " <<compare(out, num3.getBin())<<std::endl;
     std::cout <<"_________________________"<< std::endl;
     
     return 0;
