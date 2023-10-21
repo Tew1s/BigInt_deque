@@ -289,6 +289,17 @@ public:
         }
         return true;
     }
+    bool operator>= (const BigInt& other) const{
+        if((*this) > other || (*this) == other)
+            return true;
+        return false;
+    }
+    
+    bool operator<= (const BigInt& other) const{
+        if((*this) < other || (*this) == other)
+            return true;
+        return false;
+    }
     //mul
     BigInt operator* (const BigInt& other) const {
         size_t n = blocks.size();
