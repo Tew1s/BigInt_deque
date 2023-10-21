@@ -1,4 +1,4 @@
-# DL_labs
+# BigInt_deque
 
 ## Lab2 unsigned BigInteger class
 
