@@ -329,8 +329,8 @@ public:
         BigInt p2 = a0*b0;
         BigInt p3 = (a0 + a1)*(b0 + b1) - p1 - p2;
 
-        p1 << (halfLen * 2 * 32);
-        p3 << (halfLen * 32);
+        p1 = p1 << (halfLen * 2 * 32);
+        p3 = p3 << (halfLen * 32);
         return p1 + p2 + p3;
     }
 
