@@ -1,6 +1,6 @@
 # DL_labs
 
-## Lab2 BigInteger class
+## Lab2 unsigned BigInteger class
 
 This class contains one field deque<usigned int >. Each element of deque represented as 32 bits. Every hex or binary number splited by 32 bits and writes into one field deque.
 To create class use:  `BigInt number;` .
